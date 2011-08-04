@@ -53,7 +53,7 @@ public class CriticTest {
     public void reportsOnSpecifiedNumberOfDays() {
         critic.acceptPull(july(29));
 
-        List<ContinuousIntegrationData> dataSet = critic.reportIntegrations(july(29), 1);
+        List<ContinuousIntegrationData> dataSet = critic.findIntegrations(july(29), 1);
 
         assertEquals(1, dataSet.size());
         assertEquals(july(29), dataSet.get(0).getDate());
@@ -68,7 +68,7 @@ public class CriticTest {
         critic.acceptPush(july(30));
         critic.acceptPull(july(31));
 
-        List<ContinuousIntegrationData> dataSet = critic.reportIntegrations(july(30), 3);
+        List<ContinuousIntegrationData> dataSet = critic.findIntegrations(july(30), 3);
 
         assertEquals(3, dataSet.size());
         assertEquals(july(28), dataSet.get(0).getDate());
@@ -82,7 +82,7 @@ public class CriticTest {
         critic.acceptPull(july(29));
         critic.acceptPush(july(30));
 
-        List<ContinuousIntegrationData> dataSet = critic.reportIntegrations(july(30), 2);
+        List<ContinuousIntegrationData> dataSet = critic.findIntegrations(july(30), 2);
 
         assertEquals(2, dataSet.size());
         assertEquals(july(29), dataSet.get(0).getDate());
@@ -108,7 +108,7 @@ public class CriticTest {
     private Date july(int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(0);
-        calendar.set(2011, Calendar.JULY, day, 0, 0, 0);
+        calendar.set(2011, Calendar.JULY, day);
         return calendar.getTime();
     }
 }

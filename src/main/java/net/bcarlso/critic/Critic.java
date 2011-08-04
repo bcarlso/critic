@@ -21,7 +21,7 @@ public class Critic {
         return integrationsByDate.get(date);
     }
 
-    public List<ContinuousIntegrationData> reportIntegrations(Date startingPoint, int daysBack) {
+    public List<ContinuousIntegrationData> findIntegrations(Date startingPoint, int daysBack) {
         ArrayList<ContinuousIntegrationData> results = new ArrayList<ContinuousIntegrationData>();
         for (ContinuousIntegrationData integrationData : integrationsByDate.values()) {
             if (dataIsOlderThanRequestedDate(integrationData, startingPoint)) {
