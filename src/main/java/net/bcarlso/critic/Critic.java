@@ -1,49 +1,43 @@
 package net.bcarlso.critic;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Critic {
-    private Accumulator<Date> pushAccumulator = new Accumulator<Date>();
-    private Accumulator<Date> pullAccumulator = new Accumulator<Date>();
+    private HashMap<Date, ContinuousIntegrationData> integrationsByDate = new HashMap<Date, ContinuousIntegrationData>();
 
     public int acceptPush(Date date) {
-        return pushAccumulator.incrementFor(date);
+        return integrationsFor(date).pushReceived();
     }
 
     public int acceptPull(Date date) {
-        return pullAccumulator.incrementFor(date);
+        return integrationsFor(date).pullReceived();
     }
 
-    private class Accumulator<T> {
-        private Map<T, Integer> counts = new HashMap<T, Integer>();
+    private ContinuousIntegrationData integrationsFor(Date date) {
+        if (!integrationsByDate.containsKey(date)) {
+            integrationsByDate.put(date, new ContinuousIntegrationData(date));
+        }
 
-        public int incrementFor(T key) {
-            if(alreadyAccumulating(key))
-                increment(key);
-            else {
-                initializeCountFor(key);
+        return integrationsByDate.get(date);
+    }
+
+    public List<ContinuousIntegrationData> reportIntegrations(Date startingPoint, int daysBack) {
+        ArrayList<ContinuousIntegrationData> results = new ArrayList<ContinuousIntegrationData>();
+        for (ContinuousIntegrationData integrationData : integrationsByDate.values()) {
+            if (dataIsOlderThanRequestedDate(integrationData, startingPoint)) {
+                results.add(integrationData);
             }
-
-            return currentCountFor(key);
         }
 
-        private void increment(T key) {
-            counts.put(key, currentCountFor(key) + 1);
-        }
+        Collections.sort(results);
+        return resultsLimitedTo(daysBack, results);
+    }
 
-        private boolean alreadyAccumulating(T key) {
-            return counts.containsKey(key);
-        }
+    private boolean dataIsOlderThanRequestedDate(ContinuousIntegrationData integrationData, Date date) {
+        return integrationData.getDate().compareTo(date) <= 0;
+    }
 
-        private void initializeCountFor(T key) {
-            int value = 1;
-            counts.put(key, value);
-        }
-
-        private int currentCountFor(T key) {
-            return counts.get(key).intValue();
-        }
+    private List<ContinuousIntegrationData> resultsLimitedTo(int daysBack, ArrayList<ContinuousIntegrationData> temp) {
+        return temp.subList(Math.max(0, temp.size() - daysBack), temp.size());
     }
 }
