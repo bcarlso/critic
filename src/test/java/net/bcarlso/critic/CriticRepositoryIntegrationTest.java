@@ -24,6 +24,13 @@ public class CriticRepositoryIntegrationTest {
     }
 
     @Test
+    public void createsFileWhenItDoesntExist() {
+        CriticRepository repository = new CriticRepository(FILENAME);
+        repository.load();
+        assertTrue(REPOSITORY_FILE.exists());
+    }
+
+    @Test
     public void savesDataAsPropertiesFile() {
         CriticRepository repository = new CriticRepository(FILENAME);
         HashMap<Date, ContinuousIntegrationData> data = new HashMap<Date, ContinuousIntegrationData>();

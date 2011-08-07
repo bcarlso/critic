@@ -39,8 +39,8 @@ public class CriticControllerTest {
     public void getRendersReportBasedOnDateAndTimespan() throws IOException {
         PrintWriter writer = mock(PrintWriter.class);
 
-        when(request.getParameter("date")).thenReturn("2011-07-31");
-        when(request.getParameter("report_period")).thenReturn("10");
+        when(request.getParameter(CriticController.Parameters.DATE)).thenReturn("2011-07-31");
+        when(request.getParameter(CriticController.Parameters.PERIOD)).thenReturn("10");
         when(critic.findIntegrations(july(31), 10)).thenReturn(CI_REPORT);
         when(renderer.render(CI_REPORT)).thenReturn("result from renderer");
         when(response.getWriter()).thenReturn(writer);

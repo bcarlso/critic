@@ -25,11 +25,12 @@
 <h1>Continuous Integration Activity by Day</h1>
 
 <div id="placeholder" />
-
+<div id="noresults" style="display:none">No activity found</div>
 <script type="text/javascript">
 $(function () {
     $.ajax({
         url: "critic",
+        data: { "date": "2011-01-06", "report_period": 5 },
         dataType: "json",
         success: function(results) {
             var pulls = [];
@@ -40,18 +41,23 @@ $(function () {
                 pushes.push([index, result.pushes])
                 dates.push([index, result.date])
             });
-            $.plot($("#placeholder"), [
-                { label: "Pushes", data: pushes },
-                { label: "Pulls", data: pulls }
-            ], {
-                series: {
-                    lines: { show: true },
-                    points: { show: true }
-                },
-                xaxis: {
-                    ticks: dates
-                }
-            });
+            if(dates.length() == 0) {
+                $('#noresults').show()
+            } else {
+                $('#noresults').hide()
+                $.plot($("#placeholder"), [
+                    { label: "Pushes", data: pushes },
+                    { label: "Pulls", data: pulls }
+                ], {
+                    series: {
+                        lines: { show: true },
+                        points: { show: true }
+                    },
+                    xaxis: {
+                        ticks: dates
+                    }
+                });
+            }
         }
     });
 });

@@ -25,6 +25,7 @@ public class CriticController extends HttpServlet {
     @Override
     public void init() throws ServletException {
         critic = new Critic();
+        renderer = new CriticJsonRenderer();
     }
 
     @Override
@@ -36,10 +37,14 @@ public class CriticController extends HttpServlet {
             String content = renderer.render(integrations);
             response.getWriter().append(content);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw wrapped(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw wrapped(e);
         }
+    }
+
+    private RuntimeException wrapped(Exception e) {
+        return new RuntimeException(e);
     }
 
     private int periodFrom(HttpServletRequest request) {

@@ -29,6 +29,10 @@ public class CriticRepository {
     public HashMap<Date, ContinuousIntegrationData> load() {
         try {
             Properties properties = new Properties();
+            File file = new File(filename);
+            if(!file.exists()){
+                    file.createNewFile();
+            }
             properties.load(getInputFile());
             return unmarshal(properties);
         } catch (IOException e) {
