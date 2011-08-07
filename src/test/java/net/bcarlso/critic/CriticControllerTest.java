@@ -3,6 +3,7 @@ package net.bcarlso.critic;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,5 +49,31 @@ public class CriticControllerTest {
         controller.doGet(request, response);
 
         verify(writer).append("result from renderer");
+    }
+
+    @Test
+    public void postRecordsPullRequests() throws IOException, ServletException {
+        when(request.getParameter(CriticController.Parameters.DATE)).thenReturn("2011-07-31");
+        when(request.getParameter(CriticController.Parameters.ACTION)).thenReturn("pull");
+        controller.doPost(request, response);
+        verify(critic).acceptPull(july(31));
+    }
+
+    @Test
+    public void postRecordsPushRequests() throws IOException, ServletException {
+        when(request.getParameter(CriticController.Parameters.DATE)).thenReturn("2011-07-31");
+        when(request.getParameter(CriticController.Parameters.ACTION)).thenReturn("push");
+        controller.doPost(request, response);
+        verify(critic).acceptPush(july(31));
+    }
+
+    @Test
+    public void returnsBadRequestWhenInvalidActionSpecified() throws IOException, ServletException {
+        when(request.getParameter(CriticController.Parameters.DATE)).thenReturn("2011-07-31");
+        when(request.getParameter(CriticController.Parameters.ACTION)).thenReturn("invalid-action");
+
+        controller.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 }

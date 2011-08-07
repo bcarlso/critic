@@ -30,8 +30,8 @@ public class CriticRepository {
         try {
             Properties properties = new Properties();
             File file = new File(filename);
-            if(!file.exists()){
-                    file.createNewFile();
+            if (!file.exists()) {
+                file.createNewFile();
             }
             properties.load(getInputFile());
             return unmarshal(properties);

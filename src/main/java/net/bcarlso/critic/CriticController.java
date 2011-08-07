@@ -15,6 +15,7 @@ public class CriticController extends HttpServlet {
     public static interface Parameters {
         String DATE = "date";
         String PERIOD = "report_period";
+        String ACTION = "action";
     }
 
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -39,6 +40,22 @@ public class CriticController extends HttpServlet {
         } catch (ParseException e) {
             throw wrapped(e);
         } catch (IOException e) {
+            throw wrapped(e);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            Date date = DATE_FORMAT.parse(request.getParameter(Parameters.DATE));
+            if ("push".equals(request.getParameter(Parameters.ACTION))) {
+                critic.acceptPush(date);
+            } else if ("pull".equals(request.getParameter(Parameters.ACTION))) {
+                critic.acceptPull(date);
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        } catch (ParseException e) {
             throw wrapped(e);
         }
     }
