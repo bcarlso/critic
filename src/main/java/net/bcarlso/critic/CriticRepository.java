@@ -50,10 +50,10 @@ public class CriticRepository {
         HashMap<Date, ContinuousIntegrationData> map = new HashMap<Date, ContinuousIntegrationData>();
         for (String entry : properties.stringPropertyNames()) {
             Date integrationDate = FILE_DATE_FORMAT.parse(entry);
-            String pushesPulls = properties.getProperty(entry);
-            String[] split = pushesPulls.split(",");
-            int pushes = Integer.parseInt(split[1]);
-            int pulls = Integer.parseInt(split[0]);
+            String csv = properties.getProperty(entry);
+            String[] values = csv.split(",");
+            int pushes = Integer.parseInt(values[1]);
+            int pulls = Integer.parseInt(values[0]);
             map.put(integrationDate, new ContinuousIntegrationData(integrationDate, pushes, pulls));
         }
         return map;
