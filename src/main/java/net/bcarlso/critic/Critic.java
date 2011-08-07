@@ -3,14 +3,19 @@ package net.bcarlso.critic;
 import java.util.*;
 
 public class Critic {
-    private HashMap<Date, ContinuousIntegrationData> integrationsByDate = new HashMap<Date, ContinuousIntegrationData>();
+    protected HashMap<Date, ContinuousIntegrationData> integrationsByDate = new HashMap<Date, ContinuousIntegrationData>();
+    private CriticRepository repository = new CriticRepository("integrations.properties");
 
     public int acceptPush(Date date) {
-        return integrationsFor(date).pushReceived();
+        int updatedTotal = integrationsFor(date).pushReceived();
+        repository.save(integrationsByDate);
+        return updatedTotal;
     }
 
     public int acceptPull(Date date) {
-        return integrationsFor(date).pullReceived();
+        int updatedTotal = integrationsFor(date).pullReceived();
+        repository.save(integrationsByDate);
+        return updatedTotal;
     }
 
     private ContinuousIntegrationData integrationsFor(Date date) {
@@ -22,6 +27,7 @@ public class Critic {
     }
 
     public List<ContinuousIntegrationData> findIntegrations(Date startingPoint, int daysBack) {
+        integrationsByDate = repository.load();
         ArrayList<ContinuousIntegrationData> results = new ArrayList<ContinuousIntegrationData>();
         for (ContinuousIntegrationData integrationData : integrationsByDate.values()) {
             if (dataIsOlderThanRequestedDate(integrationData, startingPoint)) {
@@ -39,5 +45,9 @@ public class Critic {
 
     private List<ContinuousIntegrationData> resultsLimitedTo(int daysBack, ArrayList<ContinuousIntegrationData> temp) {
         return temp.subList(Math.max(0, temp.size() - daysBack), temp.size());
+    }
+
+    public void setRepository(CriticRepository repository) {
+        this.repository = repository;
     }
 }

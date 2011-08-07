@@ -1,20 +1,31 @@
 package net.bcarlso.critic;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.internal.matchers.Any;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static net.bcarlso.critic.Helpers.july;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class CriticTest {
     private Critic critic;
+    private CriticRepository repository;
 
     @Before
     public void setUp() {
         critic = new Critic();
+        repository = mock(CriticRepository.class);
+        critic.setRepository(repository);
     }
 
     @Test
@@ -53,6 +64,8 @@ public class CriticTest {
     public void reportsOnSpecifiedNumberOfDays() {
         critic.acceptPull(july(29));
 
+        when(repository.load()).thenReturn(critic.integrationsByDate);
+
         List<ContinuousIntegrationData> dataSet = critic.findIntegrations(july(29), 1);
 
         assertEquals(1, dataSet.size());
@@ -62,11 +75,31 @@ public class CriticTest {
     }
 
     @Test
+    public void loadsReportsFromRepository() {
+        critic.findIntegrations(july(29), 1);
+        verify(repository).load();
+    }
+
+    @Test
+    public void savesOnPullEvents() {
+        critic.acceptPull(july(30));
+        verify(repository).save(Matchers.<HashMap<Date, ContinuousIntegrationData>>any());
+    }
+
+    @Test
+    public void savesOnPushEvents() {
+        critic.acceptPush(july(30));
+        verify(repository).save(Matchers.<HashMap<Date,ContinuousIntegrationData>>any());
+    }
+
+    @Test
     public void reportsOnSpecifiedNumberOfDaysAscendingByDate() {
         critic.acceptPull(july(28));
         critic.acceptPull(july(29));
         critic.acceptPush(july(30));
         critic.acceptPull(july(31));
+
+        when(repository.load()).thenReturn(critic.integrationsByDate);
 
         List<ContinuousIntegrationData> dataSet = critic.findIntegrations(july(30), 3);
 
@@ -81,6 +114,8 @@ public class CriticTest {
         critic.acceptPull(july(28));
         critic.acceptPull(july(29));
         critic.acceptPush(july(30));
+
+        when(repository.load()).thenReturn(critic.integrationsByDate);
 
         List<ContinuousIntegrationData> dataSet = critic.findIntegrations(july(30), 2);
 
@@ -103,12 +138,5 @@ public class CriticTest {
             totalPushes = critic.acceptPush(date);
         }
         return totalPushes;
-    }
-
-    private Date july(int day) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(0);
-        calendar.set(2011, Calendar.JULY, day);
-        return calendar.getTime();
     }
 }

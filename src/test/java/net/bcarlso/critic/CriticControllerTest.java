@@ -1,0 +1,52 @@
+package net.bcarlso.critic;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.List;
+
+import static net.bcarlso.critic.Helpers.july;
+import static org.mockito.Mockito.*;
+
+public class CriticControllerTest {
+
+    public static final List<ContinuousIntegrationData> CI_REPORT = Arrays.asList();
+    private HttpServletRequest request;
+    private Critic critic;
+    private CriticJsonRenderer renderer;
+    private CriticController controller;
+    private HttpServletResponse response;
+
+    @Before
+    public void setUp() throws Exception {
+        request = mock(HttpServletRequest.class);
+        critic = mock(Critic.class);
+        renderer = mock(CriticJsonRenderer.class);
+
+        controller = new CriticController();
+        controller.setCritic(critic);
+        controller.setRenderer(renderer);
+        response = mock(HttpServletResponse.class);
+    }
+
+    @Test
+    public void getRendersReportBasedOnDateAndTimespan() throws IOException {
+        PrintWriter writer = mock(PrintWriter.class);
+
+        when(request.getParameter("date")).thenReturn("2011-07-31");
+        when(request.getParameter("report_period")).thenReturn("10");
+        when(critic.findIntegrations(july(31), 10)).thenReturn(CI_REPORT);
+        when(renderer.render(CI_REPORT)).thenReturn("result from renderer");
+        when(response.getWriter()).thenReturn(writer);
+
+        controller.doGet(request, response);
+
+        verify(writer).append("result from renderer");
+    }
+}
