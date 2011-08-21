@@ -33,7 +33,6 @@ public class CriticController extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             Date date = dateFrom(request);
-            System.out.println("date = " + date);
             int daysBack = periodFrom(request);
             List<ContinuousIntegrationData> integrations = critic.findIntegrations(date, daysBack);
             String content = renderer.render(integrations);

@@ -11,7 +11,7 @@ import static net.bcarlso.critic.Helpers.july;
 public class SampleFileGenerator {
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
-            System.err.println("Usage: SampleFileGenerator [number_of_days=30");
+            System.err.println("Usage: SampleFileGenerator [number_of_days=30]");
         }
         int x = 30;
         if (args.length == 1) {

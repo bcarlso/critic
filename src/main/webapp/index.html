@@ -18,7 +18,8 @@
 			text-align: center;
 			font-family: Optima, 'Gill Sans', 'Lucida Sans', 'Lucida Grande', Corbel, Verdana, sans-serif;
 		}
-        #placeholder {
+
+        #chart {
             width: 100%;
             height: 300px;
         }
@@ -30,25 +31,26 @@
 <h3><span id="period">30</span>&nbsp;day period beginning on</h3>
 <div id="start_date">
     <form method="post" action="#" onsubmit="return false;">
-        <input id="date" type="text" name="date" value="20011-01-06"/>
-        <input id="report_period" type="hidden" name="report_period" value="30"/>
+        <input id="date" type="text" name="date" value="2011-01-06"/>
     </form>
 </div>
 <div id="slider" />
-<br />
-<div id="placeholder" />
+<br>
+<div id="chart" />
 <div id="noresults" style="display:none">No activity found</div>
 <script type="text/javascript">
 $(function () {
-    var updateChart = function(dateRange) {
+    var defaultToToday = function(element) {
+        element.datepicker("setDate", new Date());
+    }
+
+    var updateChart = function(startDate, dateRange) {
         $.ajax({
             url: "critic",
-            data: { "date": $("#date")[0].value, "report_period": dateRange },
+            data: { "date": startDate, "report_period": dateRange },
             dataType: "json",
             success: function(results) {
-                var pulls = [];
-                var pushes = [];
-                var dates = [];
+                var pulls = [], pushes = [], dates = [];
                 $.each(results, function(index, result) {
                     pulls.push([index, result.pulls])
                     pushes.push([index, result.pushes])
@@ -58,7 +60,7 @@ $(function () {
                     $('#noresults').show();
                 } else {
                     $('#noresults').hide();
-                    $.plot($("#placeholder"), [
+                    $.plot($("#chart"), [
                         { label: "Pushes", data: pushes },
                         { label: "Pulls", data: pulls }
                     ], {
@@ -79,17 +81,25 @@ $(function () {
         $("#period").text(period);
     }
 
+    $("#date").datepicker({
+        dateFormat: 'yy-mm-dd',
+        onSelect: function(date, inst) {
+            updateChart(date, $("#period").text());
+        }
+    });
+
     $("#slider").slider({
         min: 5,
         max: 90,
         value: 30,
         change: function(event, ui) {
-            updateChart(ui.value);
+            updateChart($("#date").val(), ui.value);
             updatePeriod(ui.value);
         }
     });
 
-    updateChart(30);
+    defaultToToday($("#date"));
+    updateChart($("#date").val(), 30);
 });
 </script>
 
