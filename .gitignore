@@ -3,3 +3,4 @@ target
 *.ipr
 *.iws
 .DS_Store
+integrations.properties
