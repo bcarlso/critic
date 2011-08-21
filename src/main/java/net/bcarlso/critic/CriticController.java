@@ -33,6 +33,7 @@ public class CriticController extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             Date date = dateFrom(request);
+            System.out.println("date = " + date);
             int daysBack = periodFrom(request);
             List<ContinuousIntegrationData> integrations = critic.findIntegrations(date, daysBack);
             String content = renderer.render(integrations);
@@ -48,9 +49,10 @@ public class CriticController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             Date date = DATE_FORMAT.parse(request.getParameter(Parameters.DATE));
-            if ("push".equals(request.getParameter(Parameters.ACTION))) {
+            String actionPerformed = request.getParameter(Parameters.ACTION);
+            if ("push".equals(actionPerformed)) {
                 critic.acceptPush(date);
-            } else if ("pull".equals(request.getParameter(Parameters.ACTION))) {
+            } else if ("pull".equals(actionPerformed)) {
                 critic.acceptPull(date);
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

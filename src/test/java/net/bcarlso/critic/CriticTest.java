@@ -114,6 +114,7 @@ public class CriticTest {
         critic.acceptPull(july(28));
         critic.acceptPull(july(29));
         critic.acceptPush(july(30));
+        critic.acceptPush(july(31));
 
         when(repository.load()).thenReturn(critic.integrationsByDate);
 
